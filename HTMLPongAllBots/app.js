@@ -16,7 +16,7 @@ var paddle1Y;
 var paddle2Y;
 
 var bot1Speed = 13;
-var bot2Speed = 10;
+var bot2Speed = 9;
 
 var bot2TargetY = 0;
 
@@ -102,30 +102,28 @@ function bot2Move() {
             else if (predictedY > canvas.height) predictedY = 2 * canvas.height - predictedY;
         }
 
-        predictedY = Math.max(Math.min(predictedY, canvas.height - 35), 35);
+        predictedY = Math.max(Math.min(predictedY, canvas.height), 0);
 
-        let relativeHitPos = predictedY - paddle2Y;
-        let targetY;
+        let centerY = canvas.height / 2;
+        let safetyOffset = (centerY - predictedY) * 0.15;
+        predictedY += safetyOffset;
 
-        if (relativeHitPos < PADDLE_HEIGHT / 2) {
-            targetY = predictedY - (PADDLE_HEIGHT / 3);
-        } else {
-            targetY = predictedY + (PADDLE_HEIGHT / 3);
-        }
-
-        targetY = Math.max(0, Math.min(canvas.height - PADDLE_HEIGHT, targetY));
-        bot2TargetY += (targetY - bot2TargetY) * 0.1;
-
-        let diff = bot2TargetY - paddle2YCenter;
-        if (Math.abs(diff) > 5) {
-            let moveAmount = Math.min(bot2Speed, Math.abs(diff));
-            if (diff > 0) paddle2Y += moveAmount;
-            else paddle2Y -= moveAmount;
-        }
-
-        if (paddle2Y < 0) paddle2Y = 0;
-        if (paddle2Y > canvas.height - PADDLE_HEIGHT) paddle2Y = canvas.height - PADDLE_HEIGHT;
+        bot2TargetY += (predictedY - bot2TargetY) * 0.15;
+    } else {
+        let centerY = canvas.height / 2;
+        bot2TargetY += (centerY - bot2TargetY) * 0.15;
     }
+
+    let diff = bot2TargetY - paddle2YCenter;
+
+    if (Math.abs(diff) > 2) {
+        let moveAmount = Math.min(bot2Speed, Math.abs(diff));
+        if (diff > 0) paddle2Y += moveAmount;
+        else paddle2Y -= moveAmount;
+    }
+
+    if (paddle2Y < 0) paddle2Y = 0;
+    if (paddle2Y > canvas.height - PADDLE_HEIGHT) paddle2Y = canvas.height - PADDLE_HEIGHT;
 }
 
 function speedUpBall() {
